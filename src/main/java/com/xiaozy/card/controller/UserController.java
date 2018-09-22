@@ -14,8 +14,12 @@ import com.xiaozy.card.util.CookieUtil;
 import com.xiaozy.card.util.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -182,8 +186,16 @@ public class UserController {
         map.put(ResultEnum.LOGOUT_SUCCESS.getMsg(),ResultEnum.LOGOUT_SUCCESS.getCode());
         return ResultVOUtil.success(map);
     }
+    //跨域处理
+    @Configuration
+    public class WebConfig extends WebMvcConfigurationSupport {
 
-
+        @Override
+        public void addCorsMappings(CorsRegistry registry) {
+            registry.addMapping("/**")
+                    .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+        }
+    }
     /**
      * 测试接口
      * @return
