@@ -37,7 +37,12 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,String>,JpaSp
          */
         Page<UserInfo> findAll(Pageable pageable);
 
-
+        /**
+         * 通过页码和条件查询
+         * @param spc
+         * @param pageable
+         * @return
+         */
         Page<UserInfo> findAll(Specification<UserInfo> spc, Pageable pageable);
 
 

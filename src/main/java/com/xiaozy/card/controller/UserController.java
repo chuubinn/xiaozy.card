@@ -24,7 +24,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+
 
 @RestController
 @Slf4j
@@ -95,6 +95,7 @@ public class UserController {
             }
          UserInfo userInfo1 = new UserInfo();
             userInfo1.setUserName(userName);
+            userInfo1.setPassword("123456");
             userInfo1.setUserPhone(userPhone);
             userInfo1.setUserEmail(userEmail);
             userInfo1.setSexy(sexy);

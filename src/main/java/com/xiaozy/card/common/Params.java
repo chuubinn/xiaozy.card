@@ -13,4 +13,6 @@ public class Params {
     private Integer userType;
 
     private Integer userStatus;
+
+
 }
