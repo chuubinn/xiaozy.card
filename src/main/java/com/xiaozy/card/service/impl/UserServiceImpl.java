@@ -76,19 +76,19 @@ public class UserServiceImpl implements UserService {
             public Predicate toPredicate(Root<UserInfo> root, CriteriaQuery<?> criteriaQuery, CriteriaBuilder cb) {
                 List<Predicate> predicateList = new ArrayList<>();
                 //根据userName查询
-                if (params.getUserName().equals("")||params.getUserName().equals(null)||params.getUserName().isEmpty()){
+                if (params.getUserName() !=null&&!params.getUserName().equals("")&&!params.getUserName().isEmpty()){
                     predicateList.add(cb.like(root.get("userName").as(String.class), "%" + params.getUserName() + "%"));
                 }
                 //根据sexy查询
-                if(params.getSexy().equals(0)|| params.getSexy().equals(1)){
+                if(params.getSexy() != null){
                     predicateList.add(cb.equal(root.get("sexy").as(Integer.class),params.getSexy()));
                 }
                 //根据用户类型查询
-                if (params.getUserType().equals(0)||params.getUserType().equals(1)||params.getUserType().equals(2)){
+                if (params.getUserType() != null){
                     predicateList.add(cb.equal(root.get("userType").as(Integer.class),params.getUserType()) );
                 }
                 //根据用户状态查询
-                if(params.getUserStatus().equals(0) ||params.getUserStatus().equals(1)){
+                if(params.getUserStatus() !=null){
                     predicateList.add(cb.equal(root.get("userType").as(Integer.class),params.getUserStatus()));
                 }
                 Predicate[] pre = new Predicate[predicateList.size()];

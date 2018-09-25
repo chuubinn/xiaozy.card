@@ -8,6 +8,7 @@ import com.xiaozy.card.common.Params;
 import com.xiaozy.card.constant.CookieConstant;
 import com.xiaozy.card.dataobject.UserInfo;
 import com.xiaozy.card.enums.ResultEnum;
+import com.xiaozy.card.enums.UserExceptionEnum;
 import com.xiaozy.card.exception.UserException;
 import com.xiaozy.card.service.UserService;
 import com.xiaozy.card.util.CookieUtil;
@@ -113,9 +114,9 @@ public class UserController {
     @GetMapping("/check")
     public ResultVO check(@RequestParam("pageIndex") Integer pageIndex,
                           @RequestParam("pageSize") Integer pageSize,
-                          Params params){
-        Page<UserInfo> userInfoPage = userService.findAll(pageIndex,pageSize,params);
-        return ResultVOUtil.success(userInfoPage);
+                          Params params)throws Exception{
+            Page<UserInfo> userInfoPage = userService.findAll(pageIndex,pageSize,params);
+            return ResultVOUtil.success(userInfoPage);
     }
 
 

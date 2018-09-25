@@ -9,6 +9,7 @@ public enum ResultEnum {
     USERNAME_OR_PASSWORD_ERROR(10,"用户或密码不正确"),
     LOGOUT_SUCCESS(11,"退出成功"),
     ADD_FAIL(12,"添加失败，用户名，手机号，或邮箱已存在"),
+    HTTP_ERROR(500,"查询失败")
  //   ADD_FAIL(13,"添加失败，用户名，手机号，或邮箱已存在"),
 
     ;

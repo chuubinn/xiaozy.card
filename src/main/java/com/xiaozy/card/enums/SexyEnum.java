@@ -14,7 +14,7 @@ public enum SexyEnum {
     private String message;
 
     SexyEnum(Integer code, String message) {
-        this.code = code;
-        this.message = message;
-    }
+    this.code = code;
+    this.message = message;
+}
 }
