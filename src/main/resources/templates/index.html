@@ -1,0 +1,42 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+</head>
+
+<body>
+    <div>微信回调首页</div>
+</body>
+<script>
+    $(document).ready(function () {
+        function GetQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]);
+            return null;
+        }
+         var access_token = GetQueryString("access_token")
+         var openid = GetQueryString("openid")
+         var lang = GetQueryString("lang")
+        // 调用方法
+        alert(GetQueryString("access_token"));
+        alert(GetQueryString("openid"));
+        alert(GetQueryString("lang"));
+        $.get("https://api.weixin.qq.com/sns/userinfo", {
+            access_token: access_token,
+            openid: openid,
+            lang: lang,
+        }, function (data, status) {
+            if (data.nickname) {
+                alert(data.nickname)
+            }
+            alert("Data: " + data + "\nStatus: " + status);
+        });
+    });
+</script>
+
+</html>

@@ -29,7 +29,7 @@ import java.util.*;
 
 @RestController
 @Slf4j
-@RequestMapping("/user/*")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired
@@ -204,8 +204,13 @@ public class UserController {
      */
     @GetMapping("/test")
     public String test() {
-        String str = "这是一个测试接口";
+        String str = "123";
         return str;
+    }
+
+    @GetMapping("/test1")
+    public  ResultVO test1(){
+        return  ResultVOUtil.success(1);
     }
 }
 

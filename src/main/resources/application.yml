@@ -14,14 +14,14 @@ spring:
     show-sql: true
   jackson:
     default-property-inclusion: non_null
-server:
-  servlet:
-    port: 8080
-    context-path: /card
+#server:
+#  context-path: /card
 
-  # redis:
- #   host: 192.168.199.188
- #   port: 6379
+
+
+# redis:
+#   host: 192.168.199.188
+#   port: 6379
 
 
 
