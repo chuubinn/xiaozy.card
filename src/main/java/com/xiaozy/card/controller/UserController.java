@@ -78,7 +78,7 @@ public class UserController {
      * @param userName
      * @param userPhone
      * @param userEmail
-     * @param sexy
+     * @param sex
      * @param city
      * @param userStatus
      * @return
@@ -86,7 +86,7 @@ public class UserController {
      */
     @PostMapping("/add")
     public ResultVO add(@RequestParam String userName,String userPhone,String userEmail,
-                        Integer sexy,String city,Integer userStatus) throws Exception{
+                        String sex,String city,Integer userStatus) throws Exception{
 
          //查询数据库
          userInfo = userService.findByUserName(userName);
@@ -99,7 +99,7 @@ public class UserController {
             userInfo1.setPassword("123456");
             userInfo1.setUserPhone(userPhone);
             userInfo1.setUserEmail(userEmail);
-            userInfo1.setSexy(sexy);
+            userInfo1.setSex(sex);
             userInfo1.setCity(city);
             userInfo1.setUserStatus(userStatus);
             userInfo1.setUserType(0);
@@ -125,20 +125,20 @@ public class UserController {
      * @param userName
      * @param userPhone
      * @param userEmail
-     * @param sexy
+     * @param sex
      * @param city
      * @param userStatus
      * @return
      */
     @PostMapping("/edit")
-    public ResultVO edit(@RequestParam String userName,String userPhone,String userEmail,Integer sexy,String city,Integer userStatus){
+    public ResultVO edit(@RequestParam String userName,String userPhone,String userEmail,String sex,String city,Integer userStatus){
         //通过用户名在数据库中查询
         userInfo = userService.findByUserName(userName);
         //编辑用户资料
         userInfo.setUserName(userName);
         userInfo.setUserPhone(userPhone);
         userInfo.setUserEmail(userEmail);
-        userInfo.setSexy(sexy);
+        userInfo.setSex(sex);
         userInfo.setCity(city);
         userInfo.setUserStatus(userStatus);
         //保存所作的修改
@@ -204,7 +204,7 @@ public class UserController {
      */
     @GetMapping("/test")
     public String test() {
-        String str = "123";
+        String str = "12345678";
         return str;
     }
 

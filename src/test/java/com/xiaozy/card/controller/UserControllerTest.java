@@ -24,7 +24,7 @@ public class UserControllerTest {
         userInfo.setUserName("dog");
         userInfo.setUserPhone("13321321321");
         userInfo.setUserEmail("dog@qq.com");
-        userInfo.setSexy(0);
+        userInfo.setSex("");
         userInfo.setCity("深圳");
         userInfo.setUserStatus(0);
         userInfo.setUserType(0);

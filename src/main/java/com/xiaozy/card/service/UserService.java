@@ -18,7 +18,7 @@ public interface UserService {
     /**
     *通过用户性别查询
     */
-    List<UserInfo> findBySexy(Integer sexy);
+    List<UserInfo> findBySex(String sexy);
 
     /**
      *通过用户类型查询

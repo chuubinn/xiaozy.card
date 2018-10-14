@@ -25,6 +25,12 @@ public class UserInfo {
         //用户姓名
         private String userName;
 
+        //用户openid
+        private String openid;
+
+        //用户nickname
+        private String nickname;
+
         //用户密码
         private String password;
 
@@ -35,7 +41,7 @@ public class UserInfo {
         private String userEmail;
 
         //用户性别
-        private Integer sexy ;
+        private String sex;
 
         //用户类型
         private Integer userType;
@@ -46,11 +52,23 @@ public class UserInfo {
         //用户状态
         private Integer userStatus;
 
+        //access_token
+        private String accessToken;
+
+        //获取Access_token时间戳
+        private String accessTokenTime;
+
+        //jsapi_ticket
+        private String jsapiTicket;
+
         //添加时间
         private Date createTime;
 
         //修改时间
         private Date updateTime;
+
+        //有效期限
+        private String timeOut;
 
 
     }

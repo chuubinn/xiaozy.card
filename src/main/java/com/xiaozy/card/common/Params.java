@@ -8,7 +8,7 @@ public class Params {
 
     private  String userName;
 
-    private  Integer sexy;
+    private  Integer sex;
 
     private Integer userType;
 

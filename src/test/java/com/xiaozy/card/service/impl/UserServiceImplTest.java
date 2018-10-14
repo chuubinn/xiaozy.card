@@ -33,8 +33,8 @@ public class UserServiceImplTest {
 
 
     @Test
-    public void findBySexy() {
-        List<UserInfo> userInfoList = userService.findBySexy(0);
+    public void findBySex() {
+        List<UserInfo> userInfoList = userService.findBySex("0");
         Assert.assertNotEquals(0,userInfoList.size());
     }
 
@@ -66,7 +66,7 @@ public class UserServiceImplTest {
         userInfo.setPassword("123456");
         userInfo.setUserPhone("13712345678");
         userInfo.setUserEmail("chubin@qq.com");
-        userInfo.setSexy(0);
+        userInfo.setSex("0");
         userInfo.setCity("深圳");
         userInfo.setUserType(1);
         userInfo.setUserStatus(0);

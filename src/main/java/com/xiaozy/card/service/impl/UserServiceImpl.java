@@ -34,8 +34,8 @@ public class UserServiceImpl implements UserService {
 
     //通过性别查询
     @Override
-    public List<UserInfo> findBySexy(Integer sexy) {
-        return repository.findBySexy(sexy);
+    public List<UserInfo> findBySex(String sex) {
+        return repository.findBySex(sex);
     }
 
 
@@ -80,8 +80,8 @@ public class UserServiceImpl implements UserService {
                     predicateList.add(cb.like(root.get("userName").as(String.class), "%" + params.getUserName() + "%"));
                 }
                 //根据sexy查询
-                if(params.getSexy() != null){
-                    predicateList.add(cb.equal(root.get("sexy").as(Integer.class),params.getSexy()));
+                if(params.getSex() != null){
+                    predicateList.add(cb.equal(root.get("sexy").as(Integer.class),params.getSex()));
                 }
                 //根据用户类型查询
                 if (params.getUserType() != null){
