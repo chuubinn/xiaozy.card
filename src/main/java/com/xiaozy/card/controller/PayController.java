@@ -106,16 +106,52 @@ public class PayController {
         return payService.wxPay(body,device_info,nonceStr,out_trade_no,total_fee,spbill_create_ip,timeStamp);
     }
 
-    @PostMapping("/litter/payRes")
+    @PostMapping("/little/payRes")
     @ResponseBody
     public String payRes(HttpServletRequest request){
+        log.info("异步回调:",request);
         return payService.payRes(request);
+
     }
+
+    @PostMapping("/little/refund")
+    @ResponseBody
+    public Object refund(@RequestParam("nonce_str") String nonce_str,
+                         @RequestParam("out_trade_no") String out_trade_no,
+                         @RequestParam("total_fee") Integer total_fee,
+                         @RequestParam("refund_fee") Integer refund_fee,
+                         @RequestParam("out_refund_no") String out_refund_no)throws Exception{
+        log.info("nonce_str={}",nonce_str);
+        log.info("out_trade_no={}",out_trade_no);
+        log.info("total_fee={}",total_fee);
+        log.info("refund_fee={}",refund_fee);
+        log.info("out_refund_no={}",out_refund_no);
+        return payService.refund(nonce_str,out_trade_no,total_fee,refund_fee,out_refund_no);
+
+    }
+
+    @PostMapping("/little/wxRefund")
+    @ResponseBody
+    public String wxRefund(@RequestParam("nonce_str") String nonce_str,
+                           @RequestParam("out_trade_no") String out_trade_no,
+                           @RequestParam("total_fee") Integer total_fee,
+                           @RequestParam("refund_fee") Integer refund_fee,
+                           @RequestParam("out_refund_no") String out_refund_no)throws Exception{
+        log.info("nonce_str={}",nonce_str);
+        log.info("out_trade_no={}",out_trade_no);
+        log.info("total_fee={}",total_fee);
+        log.info("refund_fee={}",refund_fee);
+        log.info("out_refund_no={}",out_refund_no);
+        return payService.wxRefund(nonce_str,out_trade_no,total_fee,refund_fee,out_refund_no);
+
+    }
+
 
     @GetMapping("/index")
     public ModelAndView index(){
         return new ModelAndView("index");
     }
+
 
 
 }

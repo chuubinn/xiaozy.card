@@ -92,7 +92,7 @@
                     body: "test",//商品描述
                     device_info: "web",//设备号
                     out_trade_no: new Date().getTime()+"",//订单号(建议每次发送随机)
-                    total_fee: "1", //1分钱
+                    total_fee: "100", //1分钱
                     timeStamp: timestamp,//支付签名时间戳(10位数字)，注意微信jssdk中的所有使用timestamp字段均为小写
                     nonceStr: nonceStr, //支付签名随机串，不长于 32 位
                     spbill_create_ip: ip //客户端ip地址

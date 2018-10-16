@@ -1,16 +1,36 @@
 package com.xiaozy.card.service.impl;
 
+import com.github.wxpay.sdk.WXPay;
+import com.github.wxpay.sdk.WXPayConfig;
 import com.xiaozy.card.dataobject.UserInfo;
 import com.xiaozy.card.repository.PayServiceRepository;
+import com.xiaozy.card.service.UserService;
 import com.xiaozy.card.util.SHA1;
 import com.xiaozy.card.util.SendHttpRequest;
+import com.xiaozy.card.util.WXMyConfigUtil;
 import com.xiaozy.card.util.XmlOrMapToggle;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.json.JSON;
 import net.sf.json.JSONObject;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContexts;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.net.ssl.SSLContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.swing.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.security.KeyStore;
 import java.util.*;
 
 import static com.xiaozy.card.util.HttpClientUtils.postXML;
@@ -22,6 +42,8 @@ public class PayServiceImpl {
 
     @Autowired
     private PayServiceRepository repository;
+
+
 
     //登陆极客小助手授权
     public String login(String code, String state){
@@ -207,7 +229,7 @@ public class PayServiceImpl {
 
         parameters.put("mch_id", "1488241012");
 
-        parameters.put("notify_url", "http://dsx2016.s1.natapp.cc/shalou/litter/payRes");
+        parameters.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
 
         parameters.put("nonce_str", nonceStr);
 
@@ -242,7 +264,7 @@ public class PayServiceImpl {
 
         mapSign.put("mch_id", "1488241012");
 
-        mapSign.put("notify_url", "http://dsx2016.s1.natapp.cc/shalou/litter/payRes");
+        mapSign.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
 
         mapSign.put("nonce_str", nonceStr);
 
@@ -375,12 +397,251 @@ public class PayServiceImpl {
         String total_fee = getXmlPara(notifyXml, "total_fee");
         String trade_type = getXmlPara(notifyXml, "trade_type");
         String transaction_id = getXmlPara(notifyXml, "transaction_id");
+        //todo 1.验证微信发过来的签名 2.支付状态 3.支付金额 4.支付的人（下单人==支付人）
 
-        //todo和数据库中的信息对比
 
-        //如果成功了，返回一下信息
         System.out.println("支付成功....");
         resXml = "<xml>" + "<return_code><![CDATA[SUCCESS]]></return_code>" + "<return_msg><![CDATA[OK]]></return_msg>" + "</xml> ";
         return resXml;
+
     }
+    //微信退款
+    public Object refund(String nonce_str,String out_trade_no,
+                       Integer total_fee,Integer refund_fee,String out_refund_no) throws Exception{
+        log.info("打印参数 >>>>>>>>>>>>>>>>>");
+        log.info("nonceStr >>>>" + nonce_str);
+        log.info("out_trade_no >>>>" + out_trade_no);
+        log.info("total_fee >>>>" + total_fee);
+        log.info("refund_fee >>>>" + refund_fee);
+        log.info("out_refund_no >>>>"+out_refund_no);
+
+        WXMyConfigUtil config = new WXMyConfigUtil();
+
+        WXPay wxPay =new WXPay(config);
+
+
+        //设置map数据
+        SortedMap<Object,Object> map = new TreeMap<>();
+        map.put("appid", "wxdfe8e9a69851a406");
+        map.put("mch_id", "1488241012");
+        map.put("nonce_str", nonce_str);
+        map.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
+        map.put("out_trade_no", out_trade_no);
+        map.put("total_fee",total_fee);
+        //退款金额
+        map.put("refund_fee",refund_fee);
+        //退款商户单号
+        map.put("out_refund_no",out_refund_no);
+        map.put("sign_type", "MD5");
+        String characterEncoding = "UTF-8";
+        //生成签名
+        String sign = createSign(characterEncoding, map);
+        System.out.println("我的签名是："+sign);
+
+
+        Map<String,String> map1 = new HashMap<>();
+        map1.put("appid", "wxdfe8e9a69851a406");
+        map1.put("mch_id", "1488241012");
+        map1.put("nonce_str", nonce_str);
+        map1.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
+        map1.put("out_trade_no", out_trade_no);
+        map1.put("total_fee",total_fee.toString());
+        map1.put("refund_fee",refund_fee.toString());
+        //退款商户单号
+        map1.put("out_refund_no",out_refund_no);
+        map1.put("sign_type", "MD5");
+        map1.put("sign",sign);
+
+        String xml = XmlOrMapToggle.map2XmlString(map1);
+        log.info("xml={}",xml);
+
+        //
+        Map<String,String>  resp = null;
+        try{
+             resp = wxPay.refund(map1);
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        System.err.println(resp);
+        String return_code = resp.get("return_code");   //返回状态码
+        String return_msg = resp.get("return_msg");     //返回信息
+
+        String resultReturn = null;
+        if ("SUCCESS".equals(return_code)) {
+            String result_code = resp.get("result_code");       //业务结果
+            String err_code_des = resp.get("err_code_des");     //错误代码描述
+            if ("SUCCESS".equals(result_code)) {
+                //表示退款申请接受成功，结果通过退款查询接口查询
+                //修改用户订单状态为退款申请中（暂时未写）
+                resultReturn = "退款申请成功";
+            } else {
+                log.info("订单号:{}错误信息:{}", err_code_des);
+                resultReturn = err_code_des;
+            }
+        } else {
+            log.info("订单号:{}错误信息:{}", return_msg);
+            resultReturn = return_msg;
+        }
+        return resultReturn;
+
+/*        //先生成map数据，在转化成xml数据发给微信
+        Map<String,String> mapSign = new HashMap<>();
+        mapSign.put("sign",sign);
+        mapSign.put("appid", "wxdfe8e9a69851a406");
+        mapSign.put("mch_id", "1488241012");
+        mapSign.put("nonce_str", nonceStr);
+        mapSign.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
+        mapSign.put("out_trade_no", out_trade_no);
+        mapSign.put("total_fee",total_fee);
+        mapSign.put("refund_fee",refund_fee);
+        mapSign.put("out_refund_no",out_refund_no);
+        mapSign.put("sign_type", "MD5");
+
+        String xml = XmlOrMapToggle.map2XmlString(mapSign);
+        log.info("发送给微信的数据 xml={}",xml);
+
+        //微信退款
+        String url = "https://api.mch.weixin.qq.com/secapi/pay/refund";
+
+        try{
+            //用Post方法向微信url发起请求，得到返回数据
+            String responseContent = postXML(url, xml);
+
+            System.out.println("商户返回:" + responseContent);
+            //将得到的返回xml转化成map1
+            Map map2 = XmlOrMapToggle.readStringXmlOut(responseContent);
+            //将map数据转化为Json格式
+            JSONObject jsonRes = JSONObject.fromObject(map2);
+
+            System.out.println("map2:"+map2);
+
+            return jsonRes;
+
+        }catch (Exception e){
+
+        }
+        return "退款已完成";*/
+    }
+
+    public String wxRefund(String nonce_str,String out_trade_no,
+                           Integer total_fee,Integer refund_fee,String out_refund_no)throws  Exception{
+        log.info("打印参数 >>>>>>>>>>>>>>>>>");
+        log.info("nonceStr >>>>" + nonce_str);
+        log.info("out_trade_no >>>>" + out_trade_no);
+        log.info("total_fee >>>>" + total_fee);
+        log.info("refund_fee >>>>" + refund_fee);
+        log.info("out_refund_no >>>>"+out_refund_no);
+        //设置map数据
+        SortedMap<Object,Object> map = new TreeMap<>();
+        map.put("appid", "wxdfe8e9a69851a406");
+        map.put("mch_id", "1488241012");
+        map.put("nonce_str", nonce_str);
+        map.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
+        map.put("out_trade_no", out_trade_no);
+        map.put("total_fee",total_fee);
+        //退款金额
+        map.put("refund_fee",refund_fee);
+        //退款商户单号
+        map.put("out_refund_no",out_refund_no);
+        map.put("sign_type", "MD5");
+        String characterEncoding = "UTF-8";
+        //生成签名
+        String sign = createSign(characterEncoding, map);
+        System.out.println("我的签名是："+sign);
+        //生成xml文件
+
+        Map<String,String> map1 = new HashMap<>();
+        map1.put("appid", "wxdfe8e9a69851a406");
+        map1.put("mch_id", "1488241012");
+        map1.put("nonce_str", nonce_str);
+        map1.put("notify_url", "http://xiaozy.natapp1.cc/wechat/little/payRes");
+        map1.put("out_trade_no", out_trade_no);
+        map1.put("total_fee",total_fee.toString());
+        map1.put("refund_fee",refund_fee.toString());
+        //退款商户单号
+        map1.put("out_refund_no",out_refund_no);
+        map1.put("sign_type", "MD5");
+        map1.put("sign",sign);
+
+        String xml = XmlOrMapToggle.map2XmlString(map1);
+        log.info("xml={}",xml);
+
+        /**
+         * 使用java证书
+         */
+        log.info("正在使用java证书");
+        //指定读取证书格式为PKCS12
+        StringBuilder sb2 = new StringBuilder();
+        WXMyConfigUtil configUtil =new WXMyConfigUtil();
+        KeyStore keyStore = KeyStore.getInstance("PKCS12");
+        //读取本机存放的PKCS12证书文件
+        FileInputStream instream = new FileInputStream(new File("D:/var/wechat/apiclient_cert.p12"));
+        try {
+            //指定PKCS12的密码(商户ID)
+            keyStore.load(instream, configUtil.getMchID().toCharArray());
+        } finally {
+            instream.close();
+        }
+        //ssl双向验证发送http请求报文
+        SSLContext sslcontext = null;
+        sslcontext = SSLContexts.custom().loadKeyMaterial(keyStore, configUtil.getMchID().toCharArray()).build();
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext, new String[]{"TLSv1"}, null, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        CloseableHttpClient httpclient = HttpClients.custom().setSSLSocketFactory(sslsf).build();
+        HttpPost httppost = new HttpPost("https://api.mch.weixin.qq.com/secapi/pay/refund");
+        StringEntity se = new StringEntity(xml.toString(), "UTF-8");
+        httppost.setEntity(se);
+        //定义响应实例对象
+        CloseableHttpResponse responseEntry = null;
+        String xmlStr2 = null;//读入响应流中字符串的引用
+        responseEntry = httpclient.execute(httppost);//发送请求
+        HttpEntity entity = responseEntry.getEntity();//获得响应实例对象
+        if (entity != null) {//读取响应流的内容
+            BufferedReader bufferedReader = null;
+            bufferedReader = new BufferedReader(new InputStreamReader(entity.getContent(), "UTF-8"));
+            while ((xmlStr2 = bufferedReader.readLine()) != null) {
+                sb2.append(xmlStr2);
+            }
+        }
+        Map<String, String> map2 = XmlOrMapToggle.readStringXmlOut(sb2.toString());
+        log.info("申请退款接口返回的结果集======>" + map);
+
+/*        //return_code为微信返回的状态码，SUCCESS表示申请退款成功，return_msg 如非空，为错误原因 签名失败 参数格式校验错误
+        if (map2.get("return_code").equalsIgnoreCase("SUCCESS")
+                && map2.get("result_code").equalsIgnoreCase("SUCCESS")) {
+            log.info("****************退款申请成功！**********************");
+            //修改订单状态为申请退款
+*//*            orderEntity.setOrderStatus(CyOrderStatusEnum.REFUND_SUCCESS.getCode());
+              mobileCyDishorderService.update(orderEntity);*//*
+            return "SUCCESS";
+        } else {
+            log.info("*****************退款申请失败！*********************");
+            return "FAIL";
+        }*/
+        String return_code = map2.get("return_code");   //返回状态码
+        String return_msg = map2.get("return_msg");     //返回信息
+
+        String resultReturn = null;
+        if ("SUCCESS".equals(return_code)) {
+            String result_code = map2.get("result_code");       //业务结果
+            String err_code_des = map2.get("err_code_des");     //错误代码描述
+            if ("SUCCESS".equals(result_code)) {
+                //表示退款申请接受成功，结果通过退款查询接口查询
+                //修改用户订单状态为退款申请中（暂时未写）
+                resultReturn = "退款申请成功";
+                return "SUCCESS";
+            } else {
+                log.info("错误信息:{}", err_code_des);
+                resultReturn = err_code_des;
+            }
+        } else {
+            log.info("错误信息:{}", return_msg);
+            resultReturn = return_msg;
+            return "Fail";
+        }
+
+        return resultReturn;
+    }
+
+
 }
